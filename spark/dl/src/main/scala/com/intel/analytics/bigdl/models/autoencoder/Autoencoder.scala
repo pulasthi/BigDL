@@ -23,24 +23,24 @@ import com.intel.analytics.bigdl.numeric.NumericFloat
 object Autoencoder {
   val rowN = 28
   val colN = 28
-  val featureSize = rowN * colN
+  val featureSize = 100
 
-  def apply(classNum: Int): Module[Float] = {
-    val model = Sequential[Float]()
+  def apply(classNum: Int): Module[Double] = {
+    val model = Sequential[Double]()
     model.add(new Reshape(Array(featureSize)))
     model.add(new Linear(featureSize, classNum))
-    model.add(new ReLU[Float]())
+    model.add(new ReLU[Double]())
     model.add(new Linear(classNum, featureSize))
-    model.add(new Sigmoid[Float]())
+    model.add(new Sigmoid[Double]())
     model
   }
 
-  def graph(classNum: Int): Module[Float] = {
-    val input = Reshape(Array(featureSize)).inputs()
-    val linear1 = Linear(featureSize, classNum).inputs(input)
-    val relu = ReLU().inputs(linear1)
-    val linear2 = Linear(classNum, featureSize).inputs(relu)
-    val output = Sigmoid().inputs(linear2)
-    Graph(input, output)
+  def graph(classNum: Int): Module[Double] = {
+    val input = Reshape[Double](Array(featureSize)).inputs()
+    val linear1 = Linear[Double](featureSize, classNum).inputs(input)
+    val relu = ReLU[Double]().inputs(linear1)
+    val linear2 = Linear[Double](classNum, featureSize).inputs(relu)
+    val output = Sigmoid[Double]().inputs(linear2)
+    Graph[Double](input, output)
   }
 }

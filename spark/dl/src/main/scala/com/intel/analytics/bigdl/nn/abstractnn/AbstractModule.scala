@@ -50,7 +50,7 @@ abstract class TensorModule[T: ClassTag]
 
 /**
  * Module is the basic component of a neural network. It forward activities and backward gradients.
- * Modules can connect to others to construct a complex neural network.
+ * Modules can connect to others to construct a complex neutoGraphral network.
  *
  * @tparam A Input data type
  * @tparam B Output data type

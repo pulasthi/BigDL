@@ -66,8 +66,8 @@ class Linear[T: ClassTag](
 
   {
     val stdv = 1.0 / math.sqrt(weight.size(2))
-    val wInit: InitializationMethod = RandomUniform(-stdv, stdv)
-    val bInit: InitializationMethod = RandomUniform(-stdv, stdv)
+    val wInit: InitializationMethod = Zeros
+    val bInit: InitializationMethod = Zeros
     setInitMethod(wInit, bInit)
   }
 

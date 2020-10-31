@@ -31,11 +31,14 @@ import com.intel.analytics.bigdl.{Module, _}
 import java.io.{File, FilenameFilter}
 import java.text.SimpleDateFormat
 import java.util.Calendar
+
+import com.intel.analytics.bigdl.optim.LocalOptimizer.logger
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.apache.log4j.Logger
 import org.apache.spark.TaskContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.util.AccumulatorV2
+
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
@@ -172,13 +175,13 @@ object DistriOptimizer extends AbstractOptimizer {
 
     logger.info(s"config $state")
     var recordsProcessedThisEpoch = optimMethods.values.head.state[Int]("recordsProcessedThisEpoch")
-    if (recordsProcessedThisEpoch == 0) {
-      val shuffleBefore = System.nanoTime()
-      logger.info("Shuffle data")
-      dataset.shuffle()
-      val shuffleEnd = System.nanoTime()
-      logger.info(s"Shuffle data complete. Takes ${(shuffleEnd - shuffleBefore) / 1e9}s")
-    }
+//    if (recordsProcessedThisEpoch == 0) {
+//      val shuffleBefore = System.nanoTime()
+//      logger.info("Shuffle data")
+//      dataset.shuffle()
+//      val shuffleEnd = System.nanoTime()
+//      logger.info(s"Shuffle data complete. Takes ${(shuffleEnd - shuffleBefore) / 1e9}s")
+//    }
 
     var tasks: ArrayBuffer[Future[_]] = new ArrayBuffer()
     var threshold = Long.MaxValue
@@ -812,6 +815,7 @@ class DistriOptimizer[T: ClassTag](
   }
 
   override def optimize(): Module[T] = {
+    val startTime = System.nanoTime()
 
     val distDataset = dataset.toDistributed()
     val trainingModel = if (Engine.getEngineType() == MklDnn && !model.isInstanceOf[MklDnnModule]
@@ -991,7 +995,8 @@ class DistriOptimizer[T: ClassTag](
       if (previousOptim != null) previousOptim.unpersist()
     }
     models.unpersist()
-
+    val endTime = System.nanoTime()
+    logger.info("Total Dist Optimizer Time : " + (endTime - startTime) / 1e6 + "ms")
     trainingModel
   }
 

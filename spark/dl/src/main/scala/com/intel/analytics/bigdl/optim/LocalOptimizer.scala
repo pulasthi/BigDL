@@ -93,6 +93,8 @@ class LocalOptimizer[T: ClassTag] (
     (1 to subModelNumber).map(_ => criterion.cloneCriterion()).toArray
 
   override def optimize(): Module[T] = {
+    val startTime = System.nanoTime()
+
     var wallClockTime = 0L
     var count = 0
     optimMethods.values.foreach{ optimMethod =>
@@ -113,7 +115,7 @@ class LocalOptimizer[T: ClassTag] (
     state("neval") = state.get[Int]("neval").getOrElse(1)
     state("isLayerwiseScaled") = Utils.isLayerwiseScaled(model)
 
-    dataset.shuffle()
+    // dataset.shuffle()
     val numSamples = dataset.data(train = false).map(_.size()).reduce(_ + _)
     var iter = dataset.data(train = true)
     logger.info("model thread pool size is " + Engine.model.getPoolSize)
@@ -209,7 +211,8 @@ class LocalOptimizer[T: ClassTag] (
     // copy running status from workingModels to model
     model.setExtraParameter(workingModels.head.getExtraParameter())
     shutdown()
-
+    val endTime = System.nanoTime()
+    logger.info("Total Optimizer Time : " + (endTime - startTime) / 1e6 + "ms")
     model
   }
 

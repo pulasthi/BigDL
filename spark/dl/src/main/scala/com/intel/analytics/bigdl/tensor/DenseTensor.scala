@@ -1038,6 +1038,7 @@ private[tensor] class DenseTensor[@specialized T: ClassTag](
       ev.add(this.nElement(), this.storage().array(), this.storageOffset() - 1, value, 1)
       this
     } else {
+
       this.apply1(ev.plus(_, value))
     }
   }

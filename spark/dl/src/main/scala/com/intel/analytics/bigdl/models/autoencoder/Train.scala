@@ -20,6 +20,7 @@ import java.nio.file.Paths
 
 import com.intel.analytics.bigdl._
 import com.intel.analytics.bigdl.dataset.image._
+import com.intel.analytics.bigdl.dataset.text.CSVtoMiniBatch
 import com.intel.analytics.bigdl.dataset.{DataSet, MiniBatch, Transformer}
 import com.intel.analytics.bigdl.nn.{MSECriterion, Module}
 import com.intel.analytics.bigdl.optim._
@@ -31,9 +32,10 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
 
 import scala.reflect.ClassTag
+import scala.io.Source
 
 object toAutoencoderBatch {
-  def apply(): toAutoencoderBatch[Float] = new toAutoencoderBatch[Float]()
+  def apply(): toAutoencoderBatch[Double] = new toAutoencoderBatch[Double]()
 }
 
 class toAutoencoderBatch[T: ClassTag](implicit ev: TensorNumeric[T]
@@ -53,8 +55,17 @@ object Train {
 
   import Utils._
 
+  def loadCSV(csvPath: String): Array[Array[Double]] = {
+    Source.fromFile(csvPath)
+      .getLines()
+      .map(_.split(",").map(_.trim.toDouble))
+      .toArray
+  }
+
   def main(args: Array[String]): Unit = {
     trainParser.parse(args, new TrainParams()).map(param => {
+      val startTime = System.nanoTime()
+
       val conf = Engine.createSparkConf().setAppName("Train Autoencoder on MNIST")
 
       val sc = new SparkContext(conf)
@@ -63,14 +74,14 @@ object Train {
       val trainData = Paths.get(param.folder, "/train-images-idx3-ubyte")
       val trainLabel = Paths.get(param.folder, "/train-labels-idx1-ubyte")
 
-      val trainDataSet = DataSet.array(load(trainData, trainLabel), sc) ->
-        BytesToGreyImg(28, 28) -> GreyImgNormalizer(trainMean, trainStd) ->
-        GreyImgToBatch(param.batchSize) -> toAutoencoderBatch()
+      val csvPath = "/home/pulasthi/work/thesis/data/csv/dummy100_100000.csv";
+      val trainDataSet = DataSet.array(loadCSV(csvPath), sc) -> CSVtoMiniBatch(param.batchSize) ->
+        toAutoencoderBatch()
 
       val model = if (param.modelSnapshot.isDefined) {
-        Module.load[Float](param.modelSnapshot.get)
+        Module.load[Double](param.modelSnapshot.get)
       } else {
-        if (param.graphModel) Autoencoder.graph(classNum = 32) else Autoencoder(classNum = 32)
+        if (param.graphModel) Autoencoder.graph(classNum = 12) else Autoencoder(classNum = 12)
       }
 
       if (param.optimizerVersion.isDefined) {
@@ -81,15 +92,15 @@ object Train {
       }
 
       val optimMethod = if (param.stateSnapshot.isDefined) {
-        OptimMethod.load[Float](param.stateSnapshot.get)
+        OptimMethod.load[Double](param.stateSnapshot.get)
       } else {
-        new Adagrad[Float](learningRate = 0.01, learningRateDecay = 0.0, weightDecay = 0.0005)
+        new Adam[Double]()
       }
 
       val optimizer = Optimizer(
         model = model,
         dataset = trainDataSet,
-        criterion = new MSECriterion[Float]()
+        criterion = new MSECriterion[Double]()
       )
 
       if (param.checkpoint.isDefined) {
@@ -100,6 +111,8 @@ object Train {
         .setEndWhen(Trigger.maxEpoch(param.maxEpoch))
         .optimize()
       sc.stop()
+      val endTime = System.nanoTime()
+      print("Total Time : " + (endTime - startTime) / 1000000 + "ms")
     })
   }
 }
