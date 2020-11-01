@@ -67,7 +67,7 @@ object TrainLarge {
       val startTime = System.nanoTime()
 
       val conf = Engine.createSparkConf().setAppName("Train AutoencoderLarge on MNIST")
-
+        .set("spark.rpc.message.maxSize", "512")
       val sc = new SparkContext(conf)
       Engine.init
 
