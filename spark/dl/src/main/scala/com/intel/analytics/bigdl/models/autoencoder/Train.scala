@@ -71,12 +71,11 @@ object Train {
       val sc = new SparkContext(conf)
       Engine.init
 
-      val trainData = Paths.get(param.folder, "/train-images-idx3-ubyte")
-      val trainLabel = Paths.get(param.folder, "/train-labels-idx1-ubyte")
+//      val trainData = Paths.get(param.folder, "/train-images-idx3-ubyte")
+//      val trainLabel = Paths.get(param.folder, "/train-labels-idx1-ubyte")
 
-      val csvPath = "/home/pulasthi/work/thesis/data/csv/dummy100_100000.csv";
-      val trainDataSet = DataSet.array(loadCSV(csvPath), sc) -> CSVtoMiniBatch(param.batchSize) ->
-        toAutoencoderBatch()
+      val trainDataSet = DataSet.array(loadCSV(param.folder), sc) ->
+        CSVtoMiniBatch(param.batchSize) -> toAutoencoderBatch()
 
       val model = if (param.modelSnapshot.isDefined) {
         Module.load[Double](param.modelSnapshot.get)
@@ -113,6 +112,7 @@ object Train {
       sc.stop()
       val endTime = System.nanoTime()
       print("Total Time : " + (endTime - startTime) / 1000000 + "ms")
+
     })
   }
 }

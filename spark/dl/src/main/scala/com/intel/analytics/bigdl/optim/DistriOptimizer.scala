@@ -531,6 +531,9 @@ object DistriOptimizer extends AbstractOptimizer {
           s"completed training.")
       }
     }
+    println("Iterations : " + driverState[Int]("neval"))
+    println("Epoch : " + driverState[Int]("epoch"))
+    println("Loss : " + driverState[Float]("Loss"))
   }
 
   /**
