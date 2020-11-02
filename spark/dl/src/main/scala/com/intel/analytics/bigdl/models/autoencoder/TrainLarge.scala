@@ -65,6 +65,7 @@ object TrainLarge {
   def main(args: Array[String]): Unit = {
     trainParser.parse(args, new TrainParams()).map(param => {
       val startTime = System.nanoTime()
+      val dataLoadTime = System.nanoTime()
 
       val conf = Engine.createSparkConf().setAppName("Train AutoencoderLarge on MNIST")
         .set("spark.rpc.message.maxSize", "512")

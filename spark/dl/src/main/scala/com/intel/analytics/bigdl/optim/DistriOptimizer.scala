@@ -896,11 +896,14 @@ class DistriOptimizer[T: ClassTag](
       checkpointPath = Some(file)
     }
 
+
     var retryNum = 0
     val maxRetry = System.getProperty("bigdl.failure.retryTimes", "5").toInt
     val retryTimeInterval = System.getProperty("bigdl.failure.retryTimeInterval", "120").toInt
     var lastFailureTimestamp = System.nanoTime()
+    var dataLoadTime = System.nanoTime() - startTime;
 
+    var iterationTime = System.nanoTime();
     while (retryNum < maxRetry) {
       try {
         DistriOptimizer.optimize(
@@ -1000,6 +1003,8 @@ class DistriOptimizer[T: ClassTag](
     models.unpersist()
     val endTime = System.nanoTime()
     logger.info("Total Dist Optimizer Time : " + (endTime - startTime) / 1e6 + "ms")
+    logger.info("Total Data Load Time : " + dataLoadTime / 1e6 + "ms")
+    logger.info("Total Dist Optimizer Time : " + (endTime - iterationTime) / 1e6 + "ms")
     trainingModel
   }
 
