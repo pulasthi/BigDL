@@ -1004,7 +1004,7 @@ class DistriOptimizer[T: ClassTag](
     val endTime = System.nanoTime()
     logger.info("Total Dist Optimizer Time : " + (endTime - startTime) / 1e6 + "ms")
     logger.info("Total Data Load Time : " + dataLoadTime / 1e6 + "ms")
-    logger.info("Total Dist Optimizer Time : " + (endTime - iterationTime) / 1e6 + "ms")
+    logger.info("Total Iteration Time : " + (endTime - iterationTime) / 1e6 + "ms")
     trainingModel
   }
 
