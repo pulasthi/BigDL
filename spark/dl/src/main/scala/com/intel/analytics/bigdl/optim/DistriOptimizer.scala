@@ -875,6 +875,8 @@ class DistriOptimizer[T: ClassTag](
     )
 
     prepareInput()
+    var dataLoadTime = System.nanoTime() - startTime;
+    var iterationTime = System.nanoTime();
 
     val modelsAndBroadcast = DistriOptimizer.initThreadModels(trainingModel, distDataset, criterion,
       state, nodeNumber, coresPerNode, checkSingleton, allReduceParameter, parameterSplits,
@@ -901,9 +903,7 @@ class DistriOptimizer[T: ClassTag](
     val maxRetry = System.getProperty("bigdl.failure.retryTimes", "5").toInt
     val retryTimeInterval = System.getProperty("bigdl.failure.retryTimeInterval", "120").toInt
     var lastFailureTimestamp = System.nanoTime()
-    var dataLoadTime = System.nanoTime() - startTime;
 
-    var iterationTime = System.nanoTime();
     while (retryNum < maxRetry) {
       try {
         DistriOptimizer.optimize(
