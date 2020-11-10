@@ -427,10 +427,11 @@ object DistriOptimizer extends AbstractOptimizer {
         driverState("Throughput") = recordsNum.value.toFloat / ((end - start) / 1e9f)
         val _header = header(driverState[Int]("epoch"), recordsProcessedThisEpoch, numSamples,
           driverState[Int]("neval"), wallClockTime)
-        logger.info(s"${_header} Trained ${recordsNum.value} records in ${(end - start) / 1e9} " +
-          s"seconds. Throughput is ${driverState("Throughput")} records/second. Loss is ${
-            driverState("Loss")
-          }. ${getHyperParameterLog(optimMethods)}")
+        logger.info("Computation Time : " + driverMetrics.get("computing time average")._1 / 1e6)
+//        logger.info(s"${_header} Trained ${recordsNum.value} records in ${(end - start) / 1e9} " +
+//          s"seconds. Throughput is ${driverState("Throughput")} records/second. Loss is ${
+//            driverState("Loss")
+//          }. ${getHyperParameterLog(optimMethods)}")
         logger.debug("\n" + metrics.summary())
         logger.debug("Dropped modules: " + (driverSubModelNum - numFinishedModelUpdates))
         lossArray = new Array[Double](_subModelNumber)
