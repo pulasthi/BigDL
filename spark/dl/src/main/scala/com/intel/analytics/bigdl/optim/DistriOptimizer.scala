@@ -474,7 +474,7 @@ object DistriOptimizer extends AbstractOptimizer {
           wallClockTime = lastEpochTime + epochEnd - epochStart
           lastEpochTime = wallClockTime
           epochStart = System.nanoTime()
-          logger.info(s"${_header} Epoch finished. Wall clock time is ${wallClockTime / 1e6} ms")
+          // logger.info(s"${_header} Epoch finished. Wall clock time is ${wallClockTime / 1e6} ms")
 
           driverState("epoch") = driverState[Int]("epoch") + 1
           dataset.shuffle()
