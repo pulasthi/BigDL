@@ -20,12 +20,52 @@ import java.nio.ByteBuffer
 import java.nio.file.{Files, Path, Paths}
 
 import com.intel.analytics.bigdl.dataset.ByteRecord
+import com.intel.analytics.bigdl.models.autoencoder.Utils.TrainParams
 import com.intel.analytics.bigdl.utils.File
 import scopt.OptionParser
 
 import scala.collection.mutable.ArrayBuffer
 
 object Utils {
+
+  case class TrainParamsMNist(
+                          folder: String = "./",
+                          checkpoint: Option[String] = None,
+                          modelSnapshot: Option[String] = None,
+                          stateSnapshot: Option[String] = None,
+                          batchSize: Int = 150,
+                          maxEpoch: Int = 10,
+                          graphModel: Boolean = false,
+                          optimizerVersion: Option[String] = None
+                        )
+
+  val trainParserMnist = new OptionParser[TrainParamsMNist]("BigDL Autoencoder on MNIST") {
+    opt[String]('f', "folder")
+      .text("where you put the MNIST data")
+      .action((x, c) => c.copy(folder = x))
+    opt[String]("model")
+      .text("model snapshot location")
+      .action((x, c) => c.copy(modelSnapshot = Some(x)))
+    opt[String]("state")
+      .text("state snapshot location")
+      .action((x, c) => c.copy(stateSnapshot = Some(x)))
+    opt[String]("checkpoint")
+      .text("where to cache the model and state")
+      .action((x, c) => c.copy(checkpoint = Some(x)))
+    opt[Int]('b', "batchSize")
+      .text("batch size")
+      .action((x, c) => c.copy(batchSize = x))
+    opt[Int]('e', "maxEpoch")
+      .text("max epoch")
+      .action((x, c) => c.copy(maxEpoch = x))
+    opt[Unit]('g', "graphModel")
+      .text("use graph model")
+      .action((x, c) => c.copy(graphModel = true))
+    opt[String]("optimizerVersion")
+      .text("state optimizer version")
+      .action((x, c) => c.copy(optimizerVersion = Some(x)))
+  }
+
   case class TrainParams(
     folder: String = "./",
     checkpoint: Option[String] = None,

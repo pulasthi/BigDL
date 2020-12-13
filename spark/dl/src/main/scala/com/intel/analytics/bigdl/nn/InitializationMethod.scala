@@ -230,7 +230,8 @@ case object Zeros extends InitializationMethod {
 
   def init[T](variable: Tensor[T], dataFormat: VariableFormat = Default)
              (implicit ev: TensorNumeric[T]): Unit = {
-    variable.fill(ev.fromType(0.1))
+    // variable.fill(ev.fromType(0.1))
+    variable.zero()
   }
 
 }
