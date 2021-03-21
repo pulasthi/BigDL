@@ -141,7 +141,7 @@ object TrainMNIST {
       }
       optimizer
         .setOptimMethod(optimMethod)
-        .setEndWhen(Trigger.maxEpoch(1))
+        .setEndWhen(Trigger.maxEpoch(2))
         .optimize()
       val endTime = System.nanoTime()
 
@@ -154,7 +154,7 @@ object TrainMNIST {
       }
 
       var precent = 1.0 - errorCount.toDouble/result.length
-      print("Test Accuracy : " + precent*100 + "%")
+      println("Test Accuracy : " + precent*100 + "%")
       print("Total Time : " + (endTime - startTime) / 1000000 + "ms")
 
       sc.stop()

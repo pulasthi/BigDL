@@ -17,8 +17,7 @@
 package com.intel.analytics.bigdl.models.resnet
 
 import com.intel.analytics.bigdl._
-import com.intel.analytics.bigdl.models.autoencoder.Autoencoder.featureSize
-import com.intel.analytics.bigdl.nn.{Graph, _}
+import com.intel.analytics.bigdl.nn._
 import com.intel.analytics.bigdl.optim.L2Regularizer
 import com.intel.analytics.bigdl.tensor.TensorNumericMath.TensorNumeric
 

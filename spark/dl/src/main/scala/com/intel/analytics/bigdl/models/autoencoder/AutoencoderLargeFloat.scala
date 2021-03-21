@@ -19,39 +19,29 @@ package com.intel.analytics.bigdl.models.autoencoder
 import com.intel.analytics.bigdl._
 import com.intel.analytics.bigdl.nn.{Graph, _}
 
-object AutoencoderLarge {
-  val rowN = 28
-  val colN = 28
-  val featureSize = 100
-
-  def apply(classNum: Int): Module[Double] = {
-    val model = Sequential[Double]()
-    val l1 = 1024
-    val l2 = 512
-    val l3 = 128
-    val l4 = 8
+object AutoencoderLargeFloat {
+  //  val rowN = 28
+  //  val colN = 28
+  //  val featureSize = rowN * colN
+  val l1: Int = 1024
+  val l2: Int = 756
+  val l3: Int = 512
+  val l4: Int = 256
+  def apply(classNum: Int): Module[Float] = {
+    val model = Sequential[Float]()
     model.add(new Reshape(Array(l1)))
     model.add(new Linear(l1, l2))
-    model.add(new ReLU[Double]())
+    model.add(new ReLU[Float]())
     model.add(new Linear(l2, l3))
-    model.add(new ReLU[Double]())
+    model.add(new ReLU[Float]())
     model.add(new Linear(l3, l4))
-    model.add(new ReLU[Double]())
+    model.add(new ReLU[Float]())
     model.add(new Linear(l4, l3))
-    model.add(new ReLU[Double]())
+    model.add(new ReLU[Float]())
     model.add(new Linear(l3, l2))
-    model.add(new ReLU[Double]())
+    model.add(new ReLU[Float]())
     model.add(new Linear(l2, l1))
-    model.add(new ReLU[Double]())
+    model.add(new ReLU[Float]())
     model
-  }
-
-  def graph(classNum: Int): Module[Double] = {
-    val input = Reshape[Double](Array(featureSize)).inputs()
-    val linear1 = Linear[Double](featureSize, classNum).inputs(input)
-    val relu = ReLU[Double]().inputs(linear1)
-    val linear2 = Linear[Double](classNum, featureSize).inputs(relu)
-    val output = Sigmoid[Double]().inputs(linear2)
-    Graph[Double](input, output)
   }
 }
