@@ -19,28 +19,32 @@ package com.intel.analytics.bigdl.models.autoencoder
 import com.intel.analytics.bigdl._
 import com.intel.analytics.bigdl.nn.{Graph, _}
 
+import scala.Array.ofDim
+
 object AutoencoderLargeFloat {
-  //  val rowN = 28
-  //  val colN = 28
-  //  val featureSize = rowN * colN
-  val l2: Int = 756
-  val l3: Int = 512
-  val l4: Int = 256
-  def apply(inputSize: Int): Module[Float] = {
+
+  def apply(inputSize: Int, numLayers: Int): Module[Float] = {
     val model = Sequential[Float]()
     model.add(new Reshape(Array(inputSize)))
-    model.add(new Linear(inputSize, l2))
-    model.add(new ReLU[Float]())
-    model.add(new Linear(l2, l3))
-    model.add(new ReLU[Float]())
-    model.add(new Linear(l3, l4))
-    model.add(new ReLU[Float]())
-    model.add(new Linear(l4, l3))
-    model.add(new ReLU[Float]())
-    model.add(new Linear(l3, l2))
-    model.add(new ReLU[Float]())
-    model.add(new Linear(l2, inputSize))
-    model.add(new ReLU[Float]())
+
+    val layers: Array[Int] = new Array[Int](numLayers + 1);
+    layers(0) = inputSize;
+    for ( i <- 1 until layers.length) {
+      layers(i) = (layers(i - 1) * .75).toInt
+    }
+
+    println("############  :  " + layers.mkString(","))
+
+    for ( f <- 1 until layers.length) {
+      model.add(new Linear(layers(f - 1), layers(f)))
+      model.add(new ReLU[Float]())
+    }
+
+    for ( b <- (layers.length - 1)  to 1 by -1) {
+      model.add(new Linear(layers(b), layers(b - 1)))
+      model.add(new ReLU[Float]())
+    }
+
     model
   }
 }

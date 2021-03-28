@@ -36,6 +36,7 @@ object Utils {
     dataSize: Int = 150,
     inputSize: Int = 150,
     maxEpoch: Int = 10,
+    layers: Int = 4,
     graphModel: Boolean = false,
     optimizerVersion: Option[String] = None
   )
@@ -62,6 +63,9 @@ object Utils {
     opt[Int]('i', "inputSize")
       .text("inputSize size")
       .action((x, c) => c.copy(inputSize = x))
+    opt[Int]('l', "layers")
+      .text("num layers")
+      .action((x, c) => c.copy(layers = x))
     opt[Int]('e', "maxEpoch")
       .text("max epoch")
       .action((x, c) => c.copy(maxEpoch = x))

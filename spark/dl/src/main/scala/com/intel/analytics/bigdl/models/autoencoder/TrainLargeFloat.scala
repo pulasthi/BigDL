@@ -94,9 +94,8 @@ object TrainLargeFloat {
       val model = if (param.modelSnapshot.isDefined) {
         Module.load[Float](param.modelSnapshot.get)
       } else {
-        AutoencoderLargeFloat(inputSize = param.inputSize)
+        AutoencoderLargeFloat(inputSize = param.inputSize, numLayers = param.layers)
       }
-
       if (param.optimizerVersion.isDefined) {
         param.optimizerVersion.get.toLowerCase match {
           case "optimizerv1" => Engine.setOptimizerVersion(OptimizerV1)
