@@ -429,10 +429,10 @@ object DistriOptimizer extends AbstractOptimizer {
           driverState[Int]("neval"), wallClockTime)
         logger.info("Computation Time : " + driverMetrics
           .get("computing time average")._1 / ( driverMetrics.get("computing time average")._2 * 1e6))
-        logger.info(s"${_header} Trained ${recordsNum.value} records in ${(end - start) / 1e6} " +
-          s"miliseconds. Throughput is ${driverState("Throughput")} records/second. Loss is ${
-            driverState("Loss")
-          }. ${getHyperParameterLog(optimMethods)}")
+//        logger.info(s"${_header} Trained ${recordsNum.value} records in ${(end - start) / 1e6} " +
+//          s"miliseconds. Throughput is ${driverState("Throughput")} records/second. Loss is ${
+//            driverState("Loss")
+//          }. ${getHyperParameterLog(optimMethods)}")
         logger.debug("\n" + metrics.summary())
         logger.debug("Dropped modules: " + (driverSubModelNum - numFinishedModelUpdates))
         lossArray = new Array[Double](_subModelNumber)
