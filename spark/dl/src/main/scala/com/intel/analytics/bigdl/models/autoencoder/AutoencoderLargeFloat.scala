@@ -23,14 +23,13 @@ object AutoencoderLargeFloat {
   //  val rowN = 28
   //  val colN = 28
   //  val featureSize = rowN * colN
-  val l1: Int = 1024
   val l2: Int = 756
   val l3: Int = 512
   val l4: Int = 256
-  def apply(classNum: Int): Module[Float] = {
+  def apply(inputSize: Int): Module[Float] = {
     val model = Sequential[Float]()
-    model.add(new Reshape(Array(l1)))
-    model.add(new Linear(l1, l2))
+    model.add(new Reshape(Array(inputSize)))
+    model.add(new Linear(inputSize, l2))
     model.add(new ReLU[Float]())
     model.add(new Linear(l2, l3))
     model.add(new ReLU[Float]())
@@ -40,7 +39,7 @@ object AutoencoderLargeFloat {
     model.add(new ReLU[Float]())
     model.add(new Linear(l3, l2))
     model.add(new ReLU[Float]())
-    model.add(new Linear(l2, l1))
+    model.add(new Linear(l2, inputSize))
     model.add(new ReLU[Float]())
     model
   }

@@ -29,6 +29,7 @@ import com.intel.analytics.bigdl.utils.{Engine, OptimizerV1, OptimizerV2, T, Tab
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkContext
 
+import scala.Array.ofDim
 import scala.io.Source
 import scala.reflect.ClassTag
 
@@ -60,6 +61,18 @@ object TrainLargeFloat {
       .toArray
   }
 
+  def  genData(dataSize: Int, inputSize: Int) : Array[Array[Float]] = {
+    val data: Array[Array[Float]] = ofDim[Float](dataSize, inputSize);
+    val random = scala.util.Random
+    for (i <- 0 until data.length) {
+      for ( j <- 0 until data(0).length) {
+        data(i)(j) = random.nextFloat();
+      }
+    }
+
+    data
+  }
+
   def main(args: Array[String]): Unit = {
     trainParser.parse(args, new TrainParams()).map(param => {
       val startTime = System.nanoTime()
@@ -73,13 +86,15 @@ object TrainLargeFloat {
 //      val trainData = Paths.get(param.folder, "/train-images-idx3-ubyte")
 //      val trainLabel = Paths.get(param.folder, "/train-labels-idx1-ubyte")
 
-      val trainDataSet = DataSet.array(loadCSV(param.folder), sc) ->
-        CSVtoMiniBatchFloat(param.batchSize) -> toAutoencoderLargeFloatBatch()
+//      val trainDataSet = DataSet.array(loadCSV(param.folder), sc) ->
+//        CSVtoMiniBatchFloat(param.batchSize) -> toAutoencoderLargeFloatBatch()
 
+      val trainDataSet = DataSet.array(genData(param.dataSize, param.inputSize), sc) ->
+              CSVtoMiniBatchFloat(param.batchSize) -> toAutoencoderLargeFloatBatch()
       val model = if (param.modelSnapshot.isDefined) {
         Module.load[Float](param.modelSnapshot.get)
       } else {
-        AutoencoderLargeFloat(classNum = 12)
+        AutoencoderLargeFloat(inputSize = param.inputSize)
       }
 
       if (param.optimizerVersion.isDefined) {

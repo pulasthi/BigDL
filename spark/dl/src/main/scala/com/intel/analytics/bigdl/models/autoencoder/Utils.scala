@@ -33,6 +33,8 @@ object Utils {
     modelSnapshot: Option[String] = None,
     stateSnapshot: Option[String] = None,
     batchSize: Int = 150,
+    dataSize: Int = 150,
+    inputSize: Int = 150,
     maxEpoch: Int = 10,
     graphModel: Boolean = false,
     optimizerVersion: Option[String] = None
@@ -54,6 +56,12 @@ object Utils {
     opt[Int]('b', "batchSize")
       .text("batch size")
       .action((x, c) => c.copy(batchSize = x))
+    opt[Int]('d', "dataSize")
+      .text("data size")
+      .action((x, c) => c.copy(dataSize = x))
+    opt[Int]('i', "inputSize")
+      .text("inputSize size")
+      .action((x, c) => c.copy(inputSize = x))
     opt[Int]('e', "maxEpoch")
       .text("max epoch")
       .action((x, c) => c.copy(maxEpoch = x))
