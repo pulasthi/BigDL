@@ -619,7 +619,7 @@ object Engine {
     }
 
     val threadsNumber = System.getProperty("bigdl.mklNumThreads", default.toString)
-    System.setProperty("bigdl.mklNumThreads", s"$threadsNumber")
+    System.setProperty("bigdl.mklNumThreads", s"1")
 
     System.setProperty("bigdl.disable.mklBlockTime", "true")
     System.setProperty("bigdl.coreNumber", "1")
