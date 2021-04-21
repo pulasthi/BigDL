@@ -55,24 +55,24 @@ object CNNmodel {
 
   val featureSize = 3*3*64
 
-  def apply(classNum: Int): Module[Double] = {
-    val model = Sequential[Double]()
+  def apply(classNum: Int): Module[Float] = {
+    val model = Sequential[Float]()
     model.add(ConvolutionMN(1, 32, 5, 5))
-    model.add(new ReLU[Double]())
+    model.add(new ReLU[Float]())
     model.add(ConvolutionMN(32, 32, 5, 5))
     model.add(SpatialMaxPooling(2, 2, 2, 2))
-    model.add(new ReLU[Double]())
-    model.add(new Dropout[Double](0.5))
+    model.add(new ReLU[Float]())
+    model.add(new Dropout[Float](0.5))
     model.add(ConvolutionMN(32, 64, 5, 5))
     model.add(SpatialMaxPooling(2, 2, 2, 2))
-    model.add(new ReLU[Double]())
-    model.add(new Dropout[Double](0.5))
-    model.add(new Reshape[Double](Array(featureSize)))
+    model.add(new ReLU[Float]())
+    model.add(new Dropout[Float](0.5))
+    model.add(new Reshape[Float](Array(featureSize)))
     model.add(new Linear(featureSize, 256))
-    model.add(new ReLU[Double]())
-    model.add(new Dropout[Double](0.5))
+    model.add(new ReLU[Float]())
+    model.add(new Dropout[Float](0.5))
     model.add(new Linear(256, 10))
-    model.add(new LogSoftMax[Double]())
+    model.add(new LogSoftMax[Float]())
     model
   }
 }

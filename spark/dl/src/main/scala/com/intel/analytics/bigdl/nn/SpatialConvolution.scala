@@ -254,6 +254,7 @@ class SpatialConvolution[T: ClassTag](
     require(input.dim() == 3 || input.dim() == 4,
       "SpatialConvolution: " + ErrorInfo.constrainInputAs3DOrBatch)
     require(input.isContiguous())
+    var startTime = System.nanoTime();
 
     if (weightMM == null || weightMM.storage().isEmpty) {
       weightMM = weight.view(weightMMShape)
@@ -358,6 +359,8 @@ class SpatialConvolution[T: ClassTag](
       }
       Engine.model.sync(results)
     }
+  //  println("SpatialConv Time : " + (System.nanoTime() - startTime)/1e6)
+
     output
   }
 

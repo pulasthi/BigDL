@@ -543,9 +543,16 @@ object TensorNumericMath {
         a: Array[Float], aOffset: Int, lda: Int, b: Array[Float], bOffset: Int, ldb: Int,
         beta: Float, c: Array[Float], cOffset: Int, ldc: Int): Unit = {
         require(MKL.isMKLLoaded, "mkl isn't loaded")
+//        println("###### gemm: " + transa + " : " + transb + " : " + m + " : " + n + k + " : "
+//          + alpha + " : " + a.length + " : " + aOffset + " : " + lda + " : " + b.length + bOffset
+//          + " : " + ldb + " : " + beta + " : " + c.length + " : " + cOffset + " : " + ldc)
+//        System.out.println("a : " + a.sum + " b : " + b.sum + " c : " + c.sum)
+//        val time = System.nanoTime();
         MKL.vsgemm(transa, transb, m, n, k, alpha, a, aOffset, lda, b, bOffset,
           ldb, beta, c, cOffset, ldc)
+        // println("vsgemm Time : " + (System.nanoTime() - time)/1e6)
       }
+
 
       override def gemv(trans: Char, m: Int, n: Int, alpha: Float,
         a: Array[Float], aoffset: Int, lda: Int,

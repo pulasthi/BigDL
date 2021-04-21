@@ -269,10 +269,14 @@ object DistriOptimizer extends AbstractOptimizer {
               val target = miniBatchBuffer(i).getTarget()
 
               if (Engine.getEngineType() == MklBlas) {
+                var startTime = System.nanoTime();
                 val output = localModel.forward(input)
                 lossArray(i) = ev.toType[Double](localCriterion.forward(output, target))
+                //println("Forward Time : " + (System.nanoTime() - startTime)/1e6)
+                startTime = System.nanoTime();
                 val errors = localCriterion.backward(output, target)
                 localModel.backward(input, errors)
+               // println("Backword Time : " + (System.nanoTime() - startTime)/1e6)
               } else if (localModel.isInstanceOf[IRGraph[T]]) {
                 val output = localModel.forward(input)
                 Engine.dnnComputing.invokeAndWait2(Array(0).map(_ => () => {
@@ -427,7 +431,7 @@ object DistriOptimizer extends AbstractOptimizer {
         driverState("Throughput") = recordsNum.value.toFloat / ((end - start) / 1e9f)
         val _header = header(driverState[Int]("epoch"), recordsProcessedThisEpoch, numSamples,
           driverState[Int]("neval"), wallClockTime)
-        logger.info("Computation Time : " + driverMetrics
+        println("Computation Time : " + driverMetrics
           .get("computing time average")._1 / ( driverMetrics.get("computing time average")._2 * 1e6))
 //        logger.info(s"${_header} Trained ${recordsNum.value} records in ${(end - start) / 1e6} " +
 //          s"miliseconds. Throughput is ${driverState("Throughput")} records/second. Loss is ${
@@ -477,7 +481,7 @@ object DistriOptimizer extends AbstractOptimizer {
           // logger.info(s"${_header} Epoch finished. Wall clock time is ${wallClockTime / 1e6} ms")
 
           driverState("epoch") = driverState[Int]("epoch") + 1
-          dataset.shuffle()
+          // dataset.shuffle()
           dataRDD = dataset.data(train = true)
           recordsProcessedThisEpoch = 0
         }

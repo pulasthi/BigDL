@@ -35,7 +35,7 @@ import scala.reflect.ClassTag
 import scala.io.Source
 
 object toMnistBatch {
-  def apply(): toMnistBatch[Double] = new toMnistBatch[Double]()
+  def apply(): toMnistBatch[Float] = new toMnistBatch[Float]()
 }
 
 class toMnistBatch[T: ClassTag](implicit ev: TensorNumeric[T]
@@ -55,33 +55,33 @@ object TrainMNIST {
 
   import Utils._
 
-  def loadCSV(csvPath: String): Array[Array[Double]] = {
+  def loadCSV(csvPath: String): Array[Array[Float]] = {
     Source.fromFile(csvPath)
       .getLines()
-      .map(_.split(",").map(_.trim.toDouble))
+      .map(_.split(",").map(_.trim.toFloat))
       .toArray
   }
 
-  def arrayToSample(testDataArray: Array[Array[Double]]): (Array[Sample[Double]], Array[Int]) = {
+  def arrayToSample(testDataArray: Array[Array[Float]]): (Array[Sample[Float]], Array[Int]) = {
 
-    val data = new Array[Sample[Double]](testDataArray.length)
+    val data = new Array[Sample[Float]](testDataArray.length)
     val labels = new Array[Int](testDataArray.length)
     var i = 0;
-    var featureData: Array[Double] = null
-    var featureLabel: Array[Double] = null
+    var featureData: Array[Float] = null
+    var featureLabel: Array[Float] = null
 
 
     while (i < testDataArray.length) {
-      featureData = new Array[Double](testDataArray(i).length - 1)
-      featureLabel = new Array[Double](1)
+      featureData = new Array[Float](testDataArray(i).length - 1)
+      featureLabel = new Array[Float](1)
       Array.copy(testDataArray(i), 1, featureData, 0, testDataArray(i).size - 1)
-      featureLabel(0) = testDataArray(i)(0) + 1.0
+      featureLabel(0) = testDataArray(i)(0) + 1.0f
       labels(i) = testDataArray(i)(0).toInt + 1
-      val featureTensor: Tensor[Double] = Tensor[Double]()
-      val featureLabelTensor: Tensor[Double] = Tensor[Double]()
-      featureTensor.set(Storage[Double](featureData),
+      val featureTensor: Tensor[Float] = Tensor[Float]()
+      val featureLabelTensor: Tensor[Float] = Tensor[Float]()
+      featureTensor.set(Storage[Float](featureData),
         storageOffset = 1, sizes = Array(1, 28, 28))
-      featureLabelTensor.set(Storage[Double](featureLabel),
+      featureLabelTensor.set(Storage[Float](featureLabel),
         storageOffset = 1, sizes = Array(1))
 
       data(i) = Sample(featureTensor, featureLabelTensor)
@@ -101,18 +101,18 @@ object TrainMNIST {
       val sc = new SparkContext(conf)
       Engine.init
 
-      val trainDataPath = Paths.get(param.folder, "/train_small.csv")
+      val trainDataPath = Paths.get(param.folder, "/train640.csv")
       val testDataPath = Paths.get(param.folder, "/mnist_test_small.csv")
 
       val trainDataSet = DataSet.array(loadCSV(trainDataPath.toString), sc) ->
         CSVtoMiniBATCHMNIST(param.batchSize)
 
-      val testDataArray : Array[Array[Double]] = loadCSV(testDataPath.toString)
+      val testDataArray : Array[Array[Float]] = loadCSV(testDataPath.toString)
       var (testDataSet, labels) = arrayToSample(testDataArray)
       val testDataSetRDD = sc.parallelize(testDataSet, 1)
 
       val model = if (param.modelSnapshot.isDefined) {
-        Module.load[Double](param.modelSnapshot.get)
+        Module.load[Float](param.modelSnapshot.get)
       } else {
         CNNmodel(classNum = 12)
       }
@@ -125,15 +125,15 @@ object TrainMNIST {
       }
 
       val optimMethod = if (param.stateSnapshot.isDefined) {
-        OptimMethod.load[Double](param.stateSnapshot.get)
+        OptimMethod.load[Float](param.stateSnapshot.get)
       } else {
-        new Adam[Double]()
+        new Adam[Float]()
       }
 
       val optimizer = Optimizer(
         model = model,
         dataset = trainDataSet,
-        criterion = new CrossEntropyCriterion[Double]()
+        criterion = new CrossEntropyCriterion[Float]()
       )
 
       if (param.checkpoint.isDefined) {
@@ -141,21 +141,21 @@ object TrainMNIST {
       }
       optimizer
         .setOptimMethod(optimMethod)
-        .setEndWhen(Trigger.maxEpoch(2))
+        .setEndWhen(Trigger.maxEpoch(param.maxEpoch))
         .optimize()
       val endTime = System.nanoTime()
 
-      var result = model.predictClass(testDataSetRDD, 1).collect()
-      var errorCount = 0
-      for ( i <- 0 until result.length ) {
-        if ( result(i) != labels(i) ) {
-          errorCount += 1
-        }
-      }
-
-      var precent = 1.0 - errorCount.toDouble/result.length
-      println("Test Accuracy : " + precent*100 + "%")
-      print("Total Time : " + (endTime - startTime) / 1000000 + "ms")
+//      var result = model.predictClass(testDataSetRDD, 1).collect()
+//      var errorCount = 0
+//      for ( i <- 0 until result.length ) {
+//        if ( result(i) != labels(i) ) {
+//          errorCount += 1
+//        }
+//      }
+//
+//      var precent = 1.0 - errorCount.toFloat/result.length
+//      println("Test Accuracy : " + precent*100 + "%")
+//      print("Total Time : " + (endTime - startTime) / 1000000 + "ms")
 
       sc.stop()
 

@@ -28,21 +28,21 @@ object CSVtoMiniBATCHMNIST {
 }
 
 class CSVtoMiniBATCHMNIST(batchSize: Int)
-  extends Transformer[Array[Double], MiniBatch[Double]] {
+  extends Transformer[Array[Float], MiniBatch[Float]] {
 
 
-  override def apply(prev: Iterator[Array[Double]]): Iterator[MiniBatch[Double]] = {
+  override def apply(prev: Iterator[Array[Float]]): Iterator[MiniBatch[Float]] = {
 
-    new Iterator[MiniBatch[Double]] {
-      private val featureTensor: Tensor[Double] = Tensor[Double]()
-      private val featureLabelTensor: Tensor[Double] = Tensor[Double]()
-      private var featureData: Array[Double] = null
-      private var featureLabel: Array[Double] = null
+    new Iterator[MiniBatch[Float]] {
+      private val featureTensor: Tensor[Float] = Tensor[Float]()
+      private val featureLabelTensor: Tensor[Float] = Tensor[Float]()
+      private var featureData: Array[Float] = null
+      private var featureLabel: Array[Float] = null
 
 
       override def hasNext: Boolean = prev.hasNext
 
-      override def next(): MiniBatch[Double] = {
+      override def next(): MiniBatch[Float] = {
         if (prev.hasNext) {
           var i = 0
           var length = 0
@@ -50,16 +50,16 @@ class CSVtoMiniBATCHMNIST(batchSize: Int)
             val arr = prev.next()
             length = arr.length
             if (featureData == null) {
-              featureData = new Array[Double](batchSize * (arr.length - 1))
-              featureLabel = new Array[Double](batchSize)
+              featureData = new Array[Float](batchSize * (arr.length - 1))
+              featureLabel = new Array[Float](batchSize)
             }
             Array.copy(arr, 1, featureData, i * (arr.length - 1), arr.size - 1)
-            featureLabel(i) = arr(0) + 1.0
+            featureLabel(i) = arr(0) + 1.0f
             i += 1
           }
-          featureTensor.set(Storage[Double](featureData),
+          featureTensor.set(Storage[Float](featureData),
             storageOffset = 1, sizes = Array(i, 1, 28, 28))
-          featureLabelTensor.set(Storage[Double](featureLabel),
+          featureLabelTensor.set(Storage[Float](featureLabel),
             storageOffset = 1, sizes = Array(i, 1))
           MiniBatch(featureTensor, featureLabelTensor)
         } else {

@@ -28,11 +28,11 @@ trait Initializable {
   def setInitMethod(weightInitMethod: InitializationMethod = null,
                     biasInitMethod: InitializationMethod = null): this.type = {
     if (weightInitMethod != null) {
-      this.weightInitMethod = weightInitMethod
+    //  this.weightInitMethod = weightInitMethod
     }
 
     if (biasInitMethod != null) {
-      this.biasInitMethod = biasInitMethod
+    //  this.biasInitMethod = biasInitMethod
     }
     reset()
     this
