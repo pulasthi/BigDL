@@ -431,7 +431,7 @@ object DistriOptimizer extends AbstractOptimizer {
         driverState("Throughput") = recordsNum.value.toFloat / ((end - start) / 1e9f)
         val _header = header(driverState[Int]("epoch"), recordsProcessedThisEpoch, numSamples,
           driverState[Int]("neval"), wallClockTime)
-        println("Computation Time : " + driverMetrics
+        println("" + driverMetrics
           .get("computing time average")._1 / ( driverMetrics.get("computing time average")._2 * 1e6))
 //        logger.info(s"${_header} Trained ${recordsNum.value} records in ${(end - start) / 1e6} " +
 //          s"miliseconds. Throughput is ${driverState("Throughput")} records/second. Loss is ${
